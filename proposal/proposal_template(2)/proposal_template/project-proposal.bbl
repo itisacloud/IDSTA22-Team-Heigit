@@ -1,0 +1,14 @@
+\begin{thebibliography}{1}
+
+\bibitem{grus2019data}
+Joel Grus.
+\newblock {\em Data science from scratch: first principles with Python}.
+\newblock O'Reilly Media, 2019.
+
+\bibitem{WFR2017}
+{Reback, Gedalyah and Berman, Daniel}.
+\newblock An {E}lasticsearch tutorial: Getting started.
+\newblock \url{https://logz.io/blog/elasticsearch-tutorial/}, 2021.
+\newblock Last accessed on 2022-10-10.
+
+\end{thebibliography}
