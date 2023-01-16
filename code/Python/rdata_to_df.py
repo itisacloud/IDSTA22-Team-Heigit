@@ -18,6 +18,12 @@ def rdata_to_df(file):
     return df
 
 
-file = "/Users/dabanto/Desktop/out_tweets_ukr/json_output/output.RData"
 
-df = rdata_to_df(file)
+if __name__ == "__main__":
+    
+    file = "/Users/dabanto/Desktop/out_tweets_ukr/json_output/output.RData"
+    df = rdata_to_df(file)
+
+    
+    
+
