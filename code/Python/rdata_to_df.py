@@ -8,7 +8,7 @@ Created on Mon Jan 16 18:38:36 2023
 
 import pyreadr
 import pandas as pd
-
+import os
 
 def rdata_to_df(file):
     
@@ -20,9 +20,10 @@ def rdata_to_df(file):
 
 
 if __name__ == "__main__":
-    
-    file = "/Users/dabanto/Desktop/out_tweets_ukr/json_output/output.RData"
+    print(os.getcwd())
+    file = "../../files/tweets/output.RData"
     df = rdata_to_df(file)
+    print(df.head())
 
     
     
