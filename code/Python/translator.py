@@ -1,3 +1,6 @@
+from transformers import pipeline
+
+
 class Translator:
     def __init__(self):
         self.MODELS = {
@@ -21,9 +24,8 @@ class Translator:
         return None
 
 
-if __name__ == "__test__":
+if __name__ == "__main__":
     tr = Translator()
     for text in ["this is a test.@thomas_peter @günther. Das ist ein test! http:test.com", "das ist ein zweiter test",
                  "das ist ja total awesome", "this is a test", "Wie geht es dir"]:
-        text = clean(text)
         print(tr.translate(text, "de"))
