@@ -12,7 +12,7 @@ def createIndex(conn: es, name: str):
     mappings = {
         "properties": {
             "text": {"type": "text"},
-            "user": {"type": "integer"},
+            "user": {"type": "unsigned_long"},
             "timestamp": {"type": "date"},
             "NAME_0": {"type": "keyword"},
             "NAME_1": {"type": "keyword"},
@@ -45,7 +45,7 @@ def process(config):
     sent = sentimentModel(config["process"]["sentimentModel"])
 
     with es(**config["elastic"]) as conn:
-        # conn.client.indices.delete(config["process"]["indexName"])
+        #conn.client.indices.delete(config["process"]["indexName"])
         print(conn.client.info())
         if not conn.client.indices.exists(config["process"]["indexName"]):
             createIndex(conn, config["process"]["indexName"])
@@ -59,7 +59,11 @@ def process(config):
                 doc[col] = row[col]
             doc = {**doc, **ent.apply_pipeline(row["trans"]).format()}
             doc = {**doc, **sent.apply_pipeline(row["trans"]).format()}
-            conn.write(config["process"]["indexName"], index, doc)
+            try:
+                conn.write(config["process"]["indexName"], index, doc)
+            except:
+                print(doc)
+                break
 
 
 if __name__ == "__main__":

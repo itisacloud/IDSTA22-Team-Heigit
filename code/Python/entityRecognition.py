@@ -15,9 +15,7 @@ class entityModel:
         self.MODEL = pipeline("ner", model=self.MODEL, tokenizer=self.tokenizer)
 
     def apply_pipeline(self, text: str) -> entityResult:
-        print(text)
         result = self.MODEL(text)
-        print(result)
         return entityResult(text,result)
 
 
