@@ -1,13 +1,11 @@
 from transformers import pipeline, AutoTokenizer, AutoModelForTokenClassification
 
-
 class entityResult():
     def __init__(self, text:str, result:[dict]):
-        print(result)
         self.text = text
         self.result = result
     def format(self):
-        return {"enities":[{"type":res.entity,"word":self.text[res.start,res.end].lower()} for res in self.result]}
+        return {"enities":[{"type":res["entity"],"word":self.text[int(res["start"]):int(res["end"])].lower()} for res in self.result]}
 
 class entityModel:
     def __init__(self, model:str):
@@ -17,7 +15,9 @@ class entityModel:
         self.MODEL = pipeline("ner", model=self.MODEL, tokenizer=self.tokenizer)
 
     def apply_pipeline(self, text: str) -> entityResult:
+        print(text)
         result = self.MODEL(text)
+        print(result)
         return entityResult(text,result)
 
 

@@ -18,13 +18,11 @@ class sentimentModel:
 
     def apply_pipeline(self, text: str) -> sentimentResult:
         result = self.MODEL(text)
-        print(result)
         return sentimentResult(text, result)
 
 
 if __name__ == "__main__":
     sent = sentimentModel('cardiffnlp/twitter-roberta-base-sentiment-latest')
-
     for test in ["Thats Awesome!!!","i hate you","fuck that","This paper is a scientic breakthrough","three plus four is seven"]:
         res = sent.apply_pipeline(test)
         print(res.sentiment,res.sentiment_)
