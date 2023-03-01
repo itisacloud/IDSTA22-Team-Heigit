@@ -50,7 +50,7 @@ def process(config):
         if not conn.client.indices.exists(config["process"]["indexName"]):
             createIndex(conn, config["process"]["indexName"])
 
-        for index, row in df.iterrows():
+        for index, row in tqdm(df.iterrows()):
             doc = {"text": row["trans"],
                    "user": int(row["author_id"]),
                    "timestamp": row["created_at"].split(" ")[0],
