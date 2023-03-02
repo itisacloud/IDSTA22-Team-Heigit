@@ -3,6 +3,7 @@
     import L from 'leaflet';
     import {setContext, getContext, onMount} from "svelte";
     import {searchResultsStore} from "/src/stores/searchResultsStore.js";
+    import testData from '/src/components/test.json';
 
 
     let selectedRegions = [];
@@ -185,11 +186,15 @@
         // show layer depending on chosen level
 
     });
+    function test(array){
 
+        Plotly.newPlot('resultPlot', testData.data, testData.layout, testData.config);
+
+    }
     async function requestApi(array) {
         let timeIntervall = document.getElementById("timeIntervall");
         try {
-            let {data, status} = await axios.post('http://localhost:2999/search', {
+            let {data, status} = await axios.post('http://localhost:2999/plot', {
                 text: timeIntervall.value
             });
 
@@ -210,11 +215,12 @@
             href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
             integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
             crossorigin=""/>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js" type="text/javascript"></script>
 </svelte:head>
 <style>
     .map {
-        height: 50%;
-        width: 50%;
+        height: 50vh;
+        width: 50vw;
     }
 </style>
 
@@ -226,7 +232,7 @@
     </select>
 </div>
 
-<div class="select">
+<div style="size: 2vh;" class="select">
     <select class="minimal" id="timeIntervall">
         <option value="Monthly">Monthly</option>
         <option value="Weekly">Weekly</option>
@@ -236,6 +242,9 @@
 <div class='map' id="map">
     <slot></slot>
 </div>
-<h3>Run analysis.</h3>
-<button on:click={requestApi}>Get Report</button>
+<h3 style="font-size: 2vh;">Run analysis.</h3>
+<button on:click={test}>Get Report</button>
+<div id="resultPlot">
+
+</div>
 

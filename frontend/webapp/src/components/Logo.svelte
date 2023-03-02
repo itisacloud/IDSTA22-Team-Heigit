@@ -7,10 +7,8 @@
 
     let color = '#FFFFFF';
     let colors = [
-        "#3B3561",
-        "#F5B700",
-        "#DC0073",
-        "#008BF8"
+        '#0057B8',
+        '#FFD700'
     ];
 
     function setRandomColor(){
@@ -27,5 +25,5 @@
 
 </script>
 
-<h1 class="text-6xl font-extrabold select-none text-white text-[{color}] transition-colors duration-1000 cursor-pointer" bind:this={element} on:click={()=> 
-setRandomColor()}>{text}</h1>
+<h2 style= "font-size: 7vh;" class="text-6xl font-bold select-none text-white text-[{color}] transition-colors duration-1000 cursor-pointer" bind:this={element} on:click={()=>
+setRandomColor()}>{text}</h2>
