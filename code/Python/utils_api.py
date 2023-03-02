@@ -15,8 +15,8 @@ def getDocumentsById(conn:es, layer, id,index="tweets",timerange="2022-01-01:202
         }},"sort": [
         {"timestamp": "asc"},
             {"_id":"asc"}]
-
     }
+
     for i,o in zip(layer,id):
         query["query"]["bool"]["should"].append({"match":{i:o}})
     print(query)
@@ -87,4 +87,3 @@ def createEntityCount(df, interval) -> list[dict]:
 def createTweetCount(df, interval) -> list[int]:
     return groubByInterval(df, interval).apply(lambda x: len(x))
 
-if ""
