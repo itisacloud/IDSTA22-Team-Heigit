@@ -1,12 +1,15 @@
 require(academictwitteR)
 library(jsonlite)
 library(dplyr)
+library(feather)
 set_bearer()
 #> Loading required package: academictwitteR
 options(digits=15)
 
 #random dir to save the jsons
-tmpdir_test <- academictwitteR:::.gen_random_dir()
+tmpdir <- "/Users/dabanto/Desktop/out_tweets_ukr/jsons/"
+
+
 
 #query with the words that we sorted using python
 query <- paste0('(','"ukraine" OR "russia" OR "putin" OR "soviet" OR "kremlin" OR "minsk" OR 
@@ -34,8 +37,10 @@ get_all_tweets(query,
 #create a dataset using the downloaded files where all locations and their respective 
 #bounding box are listed
 
-files <- list.files(tmpdir_test, pattern = "^users")
-user_content <- jsonlite::read_json(file.path(tmpdir_test, files[1]))
+setwd(tmpdir)
+
+files <- list.files(tmpdir, pattern = "^users")
+user_content <- jsonlite::read_json(file.path(tmpdir, files[1]))
 places_content <- user_content$places
 places_content[[1]]
 
@@ -49,8 +54,38 @@ for (i in seq_along(files)){
 
 
 #read all tweets that have been downloaded as a dataframe
-tweets <- bind_tweets(tmpdir_test)
+tweets <- bind_tweets(tmpdir)
+
+newtweets<-tweets %>% select(-c(entities,public_metrics, withheld, edit_history_tweet_ids, referenced_tweets,attachments, geo)) %>%
+  cbind(tweets$public_metrics)
 
 
+place_id<-list()
+for (i in 1:length(tweets$geo$place_id)) {
+  if (length(tweets$geo$place_id[[i]])==0) {newval<-c(0,0)}
+  else {newval=tweets$geo$place_id[[i]]}
+  place_id[[i]]<-newval
+}
+place_id<-do.call(rbind,place_id)
+colnames(place_id)<-c("place_id")
+newtweets<-cbind(newtweets,place_id)
 
+jsonData <- toJSON(newtweets)
+
+jsonData <- toJSON(newtweets, pretty=TRUE, simplifyDataFrame = F)
+
+jsonData
+
+setwd("Users/dabanto/Desktop/out_tweets_ukr/json_output")
+
+write_json(jsonData, "/Users/dabanto/Desktop/out_tweets_ukr/json_output/output.json")
+
+
+write(jsonData, "/Users/dabanto/Desktop/out_tweets_ukr/json_output/output.json")
+
+save(newtweets, file = "/Users/dabanto/Desktop/out_tweets_ukr/json_output/output.RData")
+
+write_feather(newtweets, "/Users/dabanto/Desktop/out_tweets_ukr/json_output/output.feather")
+
+getwd()
 
