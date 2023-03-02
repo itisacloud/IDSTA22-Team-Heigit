@@ -1,80 +1,95 @@
-from elasticsearch import Elasticsearch, helpers
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-import csv, sys
 from pydantic import BaseModel
-from zipfile import ZipFile
-
-# unzip the data
-with ZipFile("charts.zip","r") as zip_ref:
-    zip_ref.extractall(".")
-
-# set field size limit to avoid issues with long csv columns
-csv.field_size_limit(sys.maxsize)
-
-
-class SearchQuery(BaseModel):
-    text: str
-
-class Region(BaseModel):
-    text: str
+from typing import Optional
+from main import readConfig
+from connections import elasticSearchConnection as es
+import utils_api
 
 app = FastAPI()
 
-origins = [
-    "*" 
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# index data into elastic search
-es = Elasticsearch("http://elastic:9200")
-es.options(ignore_status=[400,404]).indices.delete(index='charts')
-with open('charts.csv') as f:
-    reader = csv.DictReader(f)
-    helpers.bulk(es, reader, index='charts')
+class Item(BaseModel):
+    name: list[str]
+    layer: list[str]
+    interval: str
+    timerange: Optional[str]
 
 
-@app.get("/health")
-def health():
-    return {'success': True, 'message': 'healthy :)'}
+config = readConfig("../default.config")
 
 
-# endpoint that allows users to search on the frontend :)
-@app.post("/search")
-def search(search_query: SearchQuery):
-    es = Elasticsearch("http://elastic:9200")
-    doc = {
-        "size" : 10,
-        "query": {
-            "match": {
-                "name": {
-                    "query": search_query.text,
-                    "fuzziness": 2
-                }
-            }
-        }
-    }
-    res = es.search(index='charts', body=doc, scroll='1m')
 
-    # get results
-    data = [x['_source'] for x in res['hits']['hits']]
+@app.post("/plot")
+async def getPlots(item:Item):
+    with es(**config["elastic"]) as conn:
+        docs = utils_api.getDocumentsById(conn,item.layer,item.name,index="tweets") #add optional timerage
+        df = utils_api.dataframeFromDocuments(docs)
+        sentiment = utils_api.createSentimentAvg(df,item.interval)
+        entities = utils_api.createEntityCount(df,item.interval)
+        count = utils_api.createTweetCount(df,item.interval)
+        timestamps = count.index.tolist()
 
+        response = {
 
-    return {"query": search_query.text, 'success': True, 'results': data}
-
-@app.post("/getRegion")
-def getRegion(search_query: SearchQuery):
+            "timestamps": timestamps,
+            "sentiment": sentiment,
+            "counts": count.tolist(),
+            "entities": entities.tolist(),}
+        return response
 
 
-    return search_query.text
 
-@app.get("/")
-def root():
-    return {"Hello": "World :)"}
+
+
+
+
+        traces = []
+        df = pd.DataFrame.fromdict(response)
+        # Create figure with secondary y-axis
+        fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+        # Add traces
+
+        fig.add_trace(
+            go.Bar(y=df["counts"], name="yaxis2 data", hoverinfo='skip',
+                   marker={'color': '#FFD700'}),
+            secondary_y=True,
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                # x=df["timestamps"],
+                y=df["sentiment"],
+                customdata=np.stack((df['entities'], df['counts']), axis=-1),
+                hovertemplate='<br>'.join([
+                    'Sentiment: $%{y}',
+                    'Tweet Count: %{customdata[1]}'
+                    'Entitites : %{customdata[0]}',
+                ]),
+                line={'color': '#0057B8', "width": 5}),
+            secondary_y=False,
+        )
+
+        fig['layout']['yaxis']['autorange'] = "reversed"
+
+        # Add figure title
+        fig.update_layout(
+            title_text="Twitter Sentiment Analysis",
+            bargap=0.0,
+            plot_bgcolor='rgb(207, 226, 243)'
+        )
+
+        # Set x-axis title
+        fig.update_xaxes(title_text="Date")
+
+        # Set y-axes titles
+        fig.update_yaxes(title_text="Sentiment", secondary_y=False)
+        fig.update_yaxes(title_text="Tweet Count", secondary_y=True)
+
+        fig.show()
+
+
+
+
+
+
+
