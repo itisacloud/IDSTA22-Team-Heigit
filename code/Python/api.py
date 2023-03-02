@@ -26,12 +26,15 @@ async def getPlots(item:Item):
         sentiment = utils_api.createSentimentAvg(df,item.interval)
         entities = utils_api.createEntityCount(df,item.interval)
         count = utils_api.createTweetCount(df,item.interval)
+        timestamps = count.index.tolist()
+
         response = {
-            "timestamps": ["todo"],
-            "sentiment" :sentiment.tolist(),
-            "counts" : count.tolist(),
-            "entities" : entities.tolist(),
-        }
+
+            "timestamps": timestamps,
+            "sentiment": sentiment,
+            "counts": count.tolist(),
+            "entities": entities.tolist(),}
+        return response
 
 
 
