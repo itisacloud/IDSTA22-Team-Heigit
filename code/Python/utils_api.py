@@ -7,15 +7,19 @@ def getDocumentsById(conn:es, layer, id,index="tweets",timerange="2022-01-01:202
     query = {
         "query":{
             "bool": {
-                "must": [
-                    {"match": {layer: id}}
+                "should": [
                 ]
             ,"filter":[
              { "range": { "timestamp": { "gte": timerange.split(":")[0],"lte":timerange.split(":")[1]}}}]
 
         }},"sort": [
-        {"timestamp": "asc"}]
+        {"timestamp": "asc"},
+            {"_id":"asc"}]
+
     }
+    for i,o in zip(layer,id):
+        query["query"]["bool"]["should"].append({"match":{i:o}})
+    print(query)
     res = conn.client.search(index=index,body=query)
     docs = [i["_source"] for i in res["hits"]["hits"]]
     last = res["hits"]["hits"][-1]["sort"]
@@ -82,3 +86,5 @@ def createEntityCount(df, interval) -> list[dict]:
 
 def createTweetCount(df, interval) -> list[int]:
     return groubByInterval(df, interval).apply(lambda x: len(x))
+
+if ""
