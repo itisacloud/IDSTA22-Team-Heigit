@@ -6,7 +6,6 @@ import yaml
 def readConfig(fp:str)->dict:
     with open(fp, "r") as yamlfile:
         config = yaml.load(yamlfile, Loader=yaml.FullLoader)
-
     return config
 
 
