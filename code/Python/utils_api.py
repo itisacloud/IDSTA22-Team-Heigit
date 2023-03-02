@@ -1,36 +1,31 @@
 import pandas as pd
 from pandas import DataFrame
 from connections import elasticSearchConnection as es
+from elasticsearch.helpers import scan
+
 
 
 def getDocumentsById(conn:es, layer, id,index="tweets",timerange="2022-01-01:2023-01-01") -> list[dict]:
     query = {
-        "query":{
+        "query": {
             "bool": {
                 "should": [
                 ]
-            ,"filter":[
-             { "range": { "timestamp": { "gte": timerange.split(":")[0],"lte":timerange.split(":")[1]}}}]
+                , "filter": [
+                    {"range": {"timestamp": {"gte": timerange.split(":")[0], "lte": timerange.split(":")[1]}}}]
 
-        }},"sort": [
-        {"timestamp": "asc"},
-            {"_id":"asc"}]
+            }}, "sort": [
+            {"timestamp": "asc"}
+        ]
     }
-
-    for i,o in zip(layer,id):
-        query["query"]["bool"]["should"].append({"match":{i:o}})
-    print(query)
-    res = conn.client.search(index=index,body=query)
-    docs = [i["_source"] for i in res["hits"]["hits"]]
-    last = res["hits"]["hits"][-1]["sort"]
-    while True:
-        try:
-            query["search_after"]=last
-            res = conn.client.search(index=index,body=query)
-            docs +=[i["_source"] for i in res["hits"]["hits"]]
-            last = res["hits"]["hits"][-1]["sort"]
-        except:
-            break
+    es_response = scan(
+        conn.client,
+        index='tweets',
+        query=query
+    )
+    docs = []
+    for item in es_response:
+        docs.append(item["_source"])
     return docs
 
 def dataframeFromDocuments(documnets: list[dict]) -> DataFrame:
