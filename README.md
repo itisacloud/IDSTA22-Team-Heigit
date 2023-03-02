@@ -7,7 +7,40 @@
 
 
 
+# Introduction
 
-<iframe src="plot.html" height="500" width="500"></iframe>
+"[E]verything is related to everything else, but near things are more related
+than distant things". 
+Tobler’s first rule was abruptly brought to the at-
+tention of the people of Europe, and Germany in particular, as a result of
+Russia’s attack on Ukraine in february 2022. In addition to the mental factor
+of having a war not far from the own borders, the population is particularly
+affected by the strong dependence on Russian resources due to the geograph-
+ical proximity. 
 
-<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d306141.380212437!2d126.3453416664724!3d33.3711157139061!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x350ce3544cc84045%3A0x66bc36d2981ebf31!2sJeju-do%2C+South+Korea!5e0!3m2!1sen!2sus!4v1473136714592" width="600" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
+In order to pre-empt an escalation of political tensions within the population, 
+it is therefore useful to create an overview of the spatial distribution of
+residents who support or do not support the government’s current direction
+and which events have had an impact on public perception.
+As one of the most well-known social media platforms that offers the pos-
+sibility to export content and geolocation of a message, Twitter represents
+the best opportunity to analyze the influence of socio-economic factors and
+geopolitical events on social attitudes towards the war in Ukraine.
+
+
+
+# Tweets
+
+In order to retrieve tweets sent from Germany that address Russia’s attack on Ukraine, we relied on the R package [academictwitteR](https://github.com/user/repo/blob/branch/other_file.md). We were able to retrieve 106.000 tweets. 
+
+![My Image](all_tweets_daily.png)
+
+
+
+
+
+Most of the tweets were written in german. Nevertheless, we also identified tweets in russian, polish, turkish and ukrainian. 
+
+![My Image](langs.png)
+
+
