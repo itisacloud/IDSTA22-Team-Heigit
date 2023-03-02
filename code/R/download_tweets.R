@@ -53,10 +53,32 @@ for (i in seq_along(files)){
 }
 
 
-#read all tweets that have been downloaded as a dataframe
 tweets <- bind_tweets(tmpdir)
 
-newtweets<-tweets %>% select(-c(entities,public_metrics, withheld, edit_history_tweet_ids, referenced_tweets,attachments, geo)) %>%
+
+
+df <- df.all
+df <- subset(df, lengths(geo) > 0 & names(geo) != "type")
+str(df) 
+
+
+
+centroid <- lapply(df$geo, function(x) {
+  st_coordinates(st_centroid(st_as_sfc(st_bbox(c(xmin=x[[1]], 
+                                                 xmax=x[[3]], ymin=x[[2]], ymax=x[[4]])))))
+})
+
+
+dat <- data.frame(df, do.call('rbind', centroid)) 
+
+data_sf = dat %>% st_as_sf(.,coords=c("X","Y"),crs=4326)
+
+data_sf$geo <- NULL
+
+st_write(obj = data_sf, dsn = "/Users/dabanto/Desktop/tweets_dec_22/geo/tws.gpkg")
+
+
+newtweets<-tweets %>% select(-c(entities,public_metrics,referenced_tweets,attachments, geo, withheld, edit_history_tweet_ids, in_reply_to_user_id)) %>%
   cbind(tweets$public_metrics)
 
 
@@ -70,22 +92,17 @@ place_id<-do.call(rbind,place_id)
 colnames(place_id)<-c("place_id")
 newtweets<-cbind(newtweets,place_id)
 
-jsonData <- toJSON(newtweets)
-
-jsonData <- toJSON(newtweets, pretty=TRUE, simplifyDataFrame = F)
-
-jsonData
-
-setwd("Users/dabanto/Desktop/out_tweets_ukr/json_output")
-
-write_json(jsonData, "/Users/dabanto/Desktop/out_tweets_ukr/json_output/output.json")
 
 
-write(jsonData, "/Users/dabanto/Desktop/out_tweets_ukr/json_output/output.json")
 
-save(newtweets, file = "/Users/dabanto/Desktop/out_tweets_ukr/json_output/output.RData")
 
-write_feather(newtweets, "/Users/dabanto/Desktop/out_tweets_ukr/json_output/output.feather")
 
-getwd()
+data_sf <- rename(data_sf, place_id = id)
 
+data_sf <- data_sf %>% distinct(place_id, .keep_all = TRUE)
+
+df_merge <- merge(x = newtweets, y = data_sf[ , c("place_id", "name", "geometry")], by = "place_id", all.x=TRUE)
+
+
+
+st_write(df_merge, "/Users/dabanto/Desktop/tweets_dec_22/geo/output.gpkg")
