@@ -3,58 +3,54 @@ import json
 
 from preprocess import preprocess
 from process import process
-
-def readConfig(fp:str)->dict:
-    import yaml
-    with open(fp, "r") as yamlfile:
-        config = yaml.load(yamlfile, Loader=yaml.FullLoader)
-    return config
+from utils import readConfig
 
 
-    parser = argparse.ArgumentParser()
 
-    parser.add_argument("command",
-                        action="store",
-                        default=None,
-                        choices=["preprocess","process","full","full+bulk","api","bulk"],)
+parser = argparse.ArgumentParser()
 
-    parser.add_argument("-c","--config",
-                        action="store",
-                        default="default.config",
-                        required=True
-                        )
+parser.add_argument("command",
+                    action="store",
+                    default=None,
+                    choices=["preprocess","process","full","full+bulk","api","bulk"],)
 
-    args = parser.parse_args()
+parser.add_argument("-c","--config",
+                    action="store",
+                    default="default.config",
+                    required=True
+                    )
 
-    config = readConfig(args.config)
+args = parser.parse_args()
 
-    if args.command == "preprocess":
-        preprocess(config)
-    if args.command == "process":
-        process(config)
+config = readConfig(args.config)
 
-    if args.command == "api":
-        import uvicorn
-        uvicorn.run("main:app")
+if args.command == "preprocess":
+    preprocess(config)
+if args.command == "process":
+    process(config)
+
+if args.command == "api":
+    import uvicorn
+    uvicorn.run("main:app")
 
 
-    if args.command == "bulk":
-        from connections import elasticSearchConnection as es
-        with es(**config["elastic"]) as conn:
-            conn.bulkImport(config["process"]["indexName"],config["bulk"]["filepath"])
+if args.command == "bulk":
+    from connections import elasticSearchConnection as es
+    with es(**config["elastic"]) as conn:
+        conn.bulkImport(config["process"]["indexName"],config["bulk"]["filepath"])
 
-    if args.command == "full":
-        preprocess(config)
-        process(config)
-        import uvicorn
-        uvicorn.run("main:app")
+if args.command == "full":
+    preprocess(config)
+    process(config)
+    import uvicorn
+    uvicorn.run("main:app")
 
-    if args.command == "full+bulk":
-        from connections import elasticSearchConnection as es
-        with es(**config["elastic"]) as conn:
-            conn.bulkImport(config["process"]["indexName"], config["bulk"]["filepath"])
-        import uvicorn
-        uvicorn.run("api:app")
+if args.command == "full+bulk":
+    from connections import elasticSearchConnection as es
+    with es(**config["elastic"]) as conn:
+        conn.bulkImport(config["process"]["indexName"], config["bulk"]["filepath"])
+    import uvicorn
+    uvicorn.run("api:app")
 
 
 
