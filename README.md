@@ -48,6 +48,10 @@ The sentiment score of the tweets is depicted below. We calculated the daily mea
 
 We carried out our analysis with this dataset. 
 
+# Workflow
+
+![My Image](drw.png)
+
 
 # Documentation
 
