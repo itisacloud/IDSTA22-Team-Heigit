@@ -6,37 +6,6 @@ from os.path import join
 import pandas as pd
 from tqdm import tqdm
 
-
-def createIndex(conn: es, name: str):
-    mappings = {
-        "properties": {
-            "text": {"type": "text"},
-            "user": {"type": "unsigned_long"},
-            "timestamp": {"type": "date"},
-            "NAME_0": {"type": "keyword"},
-            "NAME_1": {"type": "keyword"},
-            "NAME_2": {"type": "keyword"},
-            "NAME_3": {"type": "keyword"},
-            "enities": {
-                "properties": {
-                    "word": {"type": "keyword"},
-                    "type": {"type": "keyword"}
-                }
-            },
-            "sentiment": {
-                "properties": {
-                    "sentiment_label": {"type": "keyword"},
-                    "sentiment_value": {"type": "float"}
-                }
-            }
-        }
-    }
-
-    print(type(conn.client))
-    conn.client.indices.create(index=name, mappings=mappings)
-
-
-
 def process(config):
     df = pd.read_pickle(config["preprocess"]["preprocessedPath"])
     df['created_at'] = df["created_at"].astype(str)
@@ -62,6 +31,7 @@ def process(config):
             except:
                 print(doc)
                 break
+
 
 
 

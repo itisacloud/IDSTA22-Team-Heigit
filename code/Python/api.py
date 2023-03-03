@@ -30,6 +30,7 @@ async def getPlots(item: Item):
 
     with es(**config["elastic"]) as conn:
         docs = utils_api.getDocumentsById(conn, item.layer, item.name, index="tweets")  # add optional timerage
+
     df = utils_api.dataframeFromDocuments(docs)
     sentiment = utils_api.createSentimentAvg(df, item.interval)
     entities = utils_api.createEntityCount(df, item.interval)
@@ -37,7 +38,6 @@ async def getPlots(item: Item):
     timestamps = count.index.tolist()
 
     response = {
-
         "timestamps": timestamps,
         "sentiment": sentiment,
         "counts": count.tolist(),
@@ -114,7 +114,7 @@ async def getPlots(item: Item):
 
     # Add figure title
     fig.update_layout(
-        title_text="Twitter Sentiment Analysis",
+        title_text=f"Twitter Sentiment Analysis for the regions: {','.join(item.name)}",
         bargap=0.0,
         plot_bgcolor='rgb(207, 226, 243)'
     )
