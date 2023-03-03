@@ -12,15 +12,13 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("command",
                     action="store",
-                    nargs='1',
                     default=None,
-                    required=True,
-                    choices=["preprocess","process","full"],)
+                    choices=["preprocess","process","full","bulk"],)
+
 parser.add_argument("-c","--config",
                     action="store",
-                    nargs='1',
-                    default=None,
-                    required=True,
+                    default="default.config",
+                    required=True
                     )
 
 args = parser.parse_args()

@@ -24,7 +24,11 @@ from translator import Translator
 from rdata_to_df import rdata_to_df
 from geo import GeoCoder, get_geo_from_id
 from tqdm import tqdm
-def preprocess(fp:str, fp_output:str, fp_aoi:str, cols: list[str]):
+def preprocess(config):
+    fp= config["preprocess"]["rawTweetsPath"]
+    fp_output= config["preprocess"]["preprocessedPath"]
+    fp_aoi= config["preprocess"]["aoiPath"]
+    cols = config["preprocess"]["columns"]
     df = rdata_to_df(fp)
     translator = Translator()
     tqdm.pandas()
@@ -36,14 +40,6 @@ def preprocess(fp:str, fp_output:str, fp_aoi:str, cols: list[str]):
     df[cols] = df.progress_apply(lambda x: geoCoder.intersect(x.geometry),result_type='expand',axis=1)
     df.to_pickle(fp_output, index=False)
 
-
-
-if __name__ == "__main__":
-    fp = r"../../files/tweets/output.RData"
-    cols = [f"NAME_{i}" for i in range(4)]
-    fp_aoi = r"../../files/aoi/3_mittel.geo.json"
-    fp_output = "../../files/tweets/output.pkl"
-    preprocess2(fp,fp_output,fp_aoi,cols)
 
 
 

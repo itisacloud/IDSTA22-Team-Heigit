@@ -1,7 +1,6 @@
 from entityRecognition import entityModel
 from sentiment import sentimentModel
 from connections import elasticSearchConnection as es
-from main import readConfig
 
 from os.path import join
 import pandas as pd
@@ -65,6 +64,4 @@ def process(config):
                 break
 
 
-if __name__ == "__main__":
-    config = readConfig(join("..", "default.config"))
-    process(config)
+
