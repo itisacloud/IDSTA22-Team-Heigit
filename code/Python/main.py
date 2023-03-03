@@ -54,6 +54,19 @@ class Item(BaseModel):
     timerange: Optional[str]
 @app.post("/plot")
 async def getPlots(item:Item):
+    import pandas as pd
+    from plotly.offline import plot
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+
+    import plotly.express as px
+    from random import randrange
+
+    import datetime
+
+    import numpy as np
+    import plotly.io as pio
+
     with es(**config["elastic"]) as conn:
         docs = utils_api.getDocumentsById(conn,item.layer,item.name,index="tweets") #add optional timerage
     df = utils_api.dataframeFromDocuments(docs)
