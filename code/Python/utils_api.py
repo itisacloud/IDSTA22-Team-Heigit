@@ -6,19 +6,22 @@ from connections import elasticSearchConnection as es
 from elasticsearch.helpers import scan
 
 
-def getDocumentsById(conn: es, layer: str, id, index: str = "tweets", timerange="2022-01-01:2023-01-01") -> list[dict]:
+def getDocumentsById(conn: es, layer: [str], id:[int], index: str = "tweets", timerange="2022-01-01:2023-01-01") -> list[dict]:
     query = {
         "query": {
             "bool": {
-                "should": [
+                "must": [
                 ]
                 , "filter": [
                     {"range": {"timestamp": {"gte": timerange.split(":")[0], "lte": timerange.split(":")[1]}}}]
-
             }}, "sort": [
             {"timestamp": "asc"}
         ]
     }
+    for l,i in zip(layer,id):
+        query["query"]["bool"]["must"].append({"match":{l:i}})
+    print(query)
+
     es_response = scan(
         conn.client,
         index='tweets',
