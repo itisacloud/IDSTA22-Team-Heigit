@@ -63,10 +63,22 @@ In order to run this project the following dependencies must be met.
 
 Conda needs to be installed on the machine as well as an environment that is based on the provided ENV.yml. The environment needs to be imported.
 To do so one can use the following command.
-conda env create -n ENVNAME --file code/ENV.yml
 
+```
+conda env create -n ENVNAME --file code/ENV.yml
+```
 
 ### Npm 
+to run the front end one does require npm and nodejs
+
+to run the front end run the following commands
+
+``` consol
+cd frontend/webapp
+npm install
+npm update
+npm run dev
+```
 
 ## Elastic search
 
@@ -88,6 +100,13 @@ Applies the models for NER and sentiment classification and writes the results d
 Note that incase the index is missing, it will be created.
 ### Api
 Launches the api using uvicorn.
+alternative way to run the api:
+```
+cd code/Python
+uvicorn api:app --reload
+
+```
+
 ### Full 
 Executes the three steps above
 ### Bulk 
@@ -97,5 +116,34 @@ This command allows to load these directly into the defined Index, without the n
 Trigers the bulk command and launches the api.
 
 ## API Endpoint
-The api offers one endpoint called \plot
+The api offers one POST endpoint called /plot.
+The request requieres a body in the following schema
 
+```
+{
+    "name":[
+       "name"
+    ],
+    "layer":[
+        "layer"
+    ],
+    "interval": "monthly" or "weekly" or "daily"
+}    
+```
+
+the response constists outofthefollowing elements
+```
+{
+    "timestamps": [str] (alist of iso formated date strings YYYY-MM-DD)
+    "sentiment": [[float,float]] (a list of lists with two values, the first represents the share of positive labeled tweets, the second represents the share of negative labeled tweets)
+    "enteties": [{str:{"n":int,"sentiment":[float]}] (a list of dictionaries with the used enteties and some meta data)
+    "plot":"str" (json object used to plot the date in the frontend)
+}
+```
+
+## Models used in this Project
+
+for the sentiment analysis the [cardiffnlp/twitter-roberta-base-sentiment-latest](https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest) with the huggingface sentiment pipeline was used.
+for the NER analysis the [dslim/bert-base-NER](https://huggingface.co/dslim/bert-base-NER) has been implemented
+
+we originaly started building our front end provided in the lecture.
