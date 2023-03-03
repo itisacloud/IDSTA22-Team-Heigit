@@ -29,12 +29,15 @@ config = readConfig(args.config)
 
 if args.command == "preprocess":
     preprocess(config)
-
 if args.command == "process":
     process(config)
 if args.command == "api":
     import uvicorn
     uvicorn.run("main:app")
+if args.command == "bulk":
+    from connections import elasticSearchConnection as es
+    with es(**config["elastic"]) as conn:
+        conn.bulkImport(config["process"]["indexName"],config["bulk"]["filepath"])
 
 from fastapi import FastAPI
 from pydantic import BaseModel
