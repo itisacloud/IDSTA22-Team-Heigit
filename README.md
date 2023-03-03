@@ -77,19 +77,19 @@ with the following command, different functionalities can be triggered.
 python ./code/Python/main.py ["preprocess","process","api","bulk"full","full+bulk"] -c ./code/default.config
 ```
 Note that a valid config file needs to be provided. For this project the code/default.config is used.
-### preprocess
+### Preprocess
 Start the preprocessing, which cleans up the individual tweets and translates them into english.
-### process
+### Process
 Applies the models for NER and sentiment classification and writes the results directly to the elastic search index.
 Note that incase the index is missing, it will be created.
-### api
+### Api
 launches the api using uvicorn.
-### full 
+### Full 
 executes the three steps above
-### bulk 
+### Bulk 
 as a shortcut, the results from the steps preprocessing and processing, have been stored as a json.
 This command allows to load these directly into the defined Index, without the need of processing.
-### full+bulk
+### Full+Bulk
 trigers the bulk command and launches the api.
 
 ## API Endpoint
