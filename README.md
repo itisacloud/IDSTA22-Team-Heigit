@@ -97,5 +97,5 @@ This command allows to load these directly into the defined Index, without the n
 Trigers the bulk command and launches the api.
 
 ## API Endpoint
-The api offers one endpoint called 
+The api offers one endpoint called \plot
 
