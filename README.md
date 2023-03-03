@@ -62,9 +62,9 @@ To do so one can use the following command.
 conda env create -n ENVNAME --file code/ENV.yml
 
 
-### npm 
+### Npm 
 
-## elastic search
+## Elastic search
 
 An elastic search connection must be provided. Please note that currently the security setting (xpack.security.enabled) must be set false in your [elasticsearch.yml](https://www.elastic.co/guide/en/elasticsearch/reference/current/security-settings.html)
 The Authors used the elastic search version 8.6.2.
