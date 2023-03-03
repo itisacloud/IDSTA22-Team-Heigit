@@ -15,7 +15,7 @@
     let map;
     let osm;
     var myStyle = {
-        fillColor: "#EEF200",  // yellow
+        fillColor: "#EEF200",
         weight: 2,
         opacity: 1,
         color: 'white',
