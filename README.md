@@ -83,15 +83,15 @@ Start the preprocessing, which cleans up the individual tweets and translates th
 Applies the models for NER and sentiment classification and writes the results directly to the elastic search index.
 Note that incase the index is missing, it will be created.
 ### Api
-launches the api using uvicorn.
+Launches the api using uvicorn.
 ### Full 
-executes the three steps above
+Executes the three steps above
 ### Bulk 
-as a shortcut, the results from the steps preprocessing and processing, have been stored as a json.
+As a shortcut, the results from the steps preprocessing and processing, have been stored as a json.
 This command allows to load these directly into the defined Index, without the need of processing.
 ### Full+Bulk
-trigers the bulk command and launches the api.
+Trigers the bulk command and launches the api.
 
 ## API Endpoint
-the api offers one endpoint called 
+The api offers one endpoint called 
 
