@@ -6,8 +6,9 @@
     import testData from '/src/components/test.json';
     import testData2 from '/src/components/test2.json';
 
-    let selectedRegions = [];
-    let selectedLayers = [];
+    export let timeIntervall = "";
+    export let selectedRegions = [];
+    export let selectedLayers = [];
     let geojson;
     let geojson2;
     let geojson3;
@@ -191,8 +192,11 @@
 
 
     });
+function chooseTimeIntervall() {
+    timeIntervall = document.getElementById("timeIntervall");
+}
             async function requestApi(array) {
-            let timeIntervall = document.getElementById("timeIntervall");
+            timeIntervall = document.getElementById("timeIntervall");
             console.log(timeIntervall.value, selectedRegions, selectedLayers)
                 let request_data = {"interval": timeIntervall,"layer":"", "name": selectedRegions}
             try {
@@ -230,7 +234,7 @@
     </div>
 
     <div style="size: 2vh;" class="select">
-        <select class="minimal" id="timeIntervall">
+        <select class="minimal" id="timeIntervall" on:change={chooseTimeIntervall}>
             <option value="Monthly">Monthly</option>
             <option value="Weekly">Weekly</option>
             <option value="Daily">Daily</option>
@@ -240,4 +244,3 @@
         <slot></slot>
     </div>
     <h3 style="font-size: 2vh;">Run analysis.</h3>
-<button on:click={requestApi}>Get Report</button>
