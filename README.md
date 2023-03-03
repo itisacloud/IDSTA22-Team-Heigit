@@ -87,4 +87,6 @@ This command allows to load these directly into the defined Index, without the n
 ### full+bulk
 trigers the bulk command and launches the api.
 
+## API Endpoint
+the api offers one endpoint called 
 

@@ -1,3 +1,5 @@
+import collections
+
 import pandas as pd
 from pandas import DataFrame
 from connections import elasticSearchConnection as es
@@ -44,8 +46,18 @@ def groubByInterval(df: DataFrame, interval: str):
         return df.groupby(df.date.dt.month)
 
 
+def listToShare(l):
+    print(l)
+
+    print(l)
+    counter = collections.Counter(l)
+    return [counter["positive"]/len(l),counter["negative"]/len(l)]
+
 def createSentimentAvg(df, interval) -> list[float]:
-    return groubByInterval(df, interval)['sentiment_score'].mean().tolist()
+    df["sentiment_label"] = df.apply(lambda x: [x.sentiment_label],axis=1)
+    df_grouped = pd.DataFrame(groubByInterval(df, interval)["sentiment_label"].sum(),)
+    #display(df_grouped)
+    return df_grouped.apply(lambda x:listToShare(x.sentiment_label),axis=1).tolist()
 
 
 def getEntityDict(x, sent):
