@@ -7,6 +7,7 @@
     import testData2 from '/src/components/test2.json';
 
     let selectedRegions = [];
+    let selectedLayers = [];
     let geojson;
     let geojson2;
     let geojson3;
@@ -67,13 +68,20 @@
             }
         }).addTo(map);
         selectedRegions.push(regionName);
+        let lvl = document.getElementById("cardtype").value;
+        if (lvl === "Federal States") selectedLayers.push("NAME_1")
+        if (lvl === "Government Districts") selectedLayers.push("NAME_2")
+        if (lvl === "County Districts") selectedLayers.push("NAME_3")
         selectedFeatureLayer.on("click", function (e) {
             for (const [key, value] of Object.entries(e.target._layers)) {
                 selectedRegions = selectedRegions.filter(e => e !== value.feature.properties.NUTS_NAME);
             }
+            let ind = selectedRegions.indexOf(regionName);
             map.removeLayer(selectedFeatureLayer);
+            selectedRegions.splice(ind, ind + 1);
+            selectedLayers.splice(ind, ind + 1);
         })
-        //selectedRegions.push(regionName);
+
     }
 
     function onEachFeature(feature, layer) {
@@ -86,6 +94,8 @@
 
     function chooseLevel() {
         //TODO: remove layer on level change
+        selectedLayers = [];
+        selectedRegions = [];
         const level = document.getElementById("cardtype");
         if (level.value === "Federal States") {
             if (map.hasLayer(geojson3)) {
@@ -136,6 +146,17 @@
             attribution:
                 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
         }).addTo(map);
+
+                fetch("http://localhost:3000/data/nuts3_germany.geojson")
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                geojson = L.geoJSON(data, {
+                    style: myStyle,
+                    onEachFeature: onEachFeature
+                })
+            });
         fetch("http://localhost:3000/data/nuts3_germany.geojson")
             .then(function (response) {
                 return response.json();
@@ -172,11 +193,10 @@
     });
             async function requestApi(array) {
             let timeIntervall = document.getElementById("timeIntervall");
-            console.log(timeIntervall.value, selectedRegions)
+            console.log(timeIntervall.value, selectedRegions, selectedLayers)
+                let request_data = {"interval": timeIntervall,"layer":"", "name": selectedRegions}
             try {
-                let {data, status} = await axios.post('http://localhost:2999/plot', {
-                    text: timeIntervall.value
-                });
+                let {data, status} = await axios.post('http://localhost:2999/plot', request_data);
                 if (status != 200) {
                     alert('Error fetching search results!');
                     return;
@@ -220,4 +240,4 @@
         <slot></slot>
     </div>
     <h3 style="font-size: 2vh;">Run analysis.</h3>
-<button on:click={requestApi()}>Get Report</button>
+<button on:click={requestApi}>Get Report</button>
