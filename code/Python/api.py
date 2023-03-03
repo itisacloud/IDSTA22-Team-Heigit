@@ -7,9 +7,7 @@ import json
 from fastapi.responses import JSONResponse
 from main import readConfig
 
-
 config = readConfig("../default.config")
-
 
 app = FastAPI()
 
@@ -24,14 +22,8 @@ class Item(BaseModel):
 @app.post("/plot")
 async def getPlots(item: Item):
     import pandas as pd
-    from plotly.offline import plot
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
-
-    import plotly.express as px
-    from random import randrange
-
-    import datetime
 
     import numpy as np
     import plotly.io as pio
@@ -60,11 +52,11 @@ async def getPlots(item: Item):
                     return row[1][inner_key]
 
     def square(row):
-
         sorted_dict = sorted(row.items(), key=sort_entities, reverse=True)
         cnt = 0
         top_entities = []
         for tup in sorted_dict:
+            tup = (tup[0].split("|")[0], tup[1])
             if cnt < 5:
                 top_entities.append(tup[0])
                 cnt += 1
@@ -76,23 +68,47 @@ async def getPlots(item: Item):
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(
         go.Bar(x=df["timestamps"], y=df["counts"], name="yaxis2 data", hoverinfo='skip',
-               marker={'color': '#FFD700'}),
+               marker={'color': '#FFD700', }),
         secondary_y=False,
     )
+    df["top_entities"] = df["entities"].apply(square)
+    df["negative"] = df["sentiment"].apply(lambda x: x[1])
+    df["positve"] = df["sentiment"].apply(lambda x: x[0])
 
     fig.add_trace(
         go.Scatter(
             x=df["timestamps"],
-            y=df["sentiment"],
+            y=df["negative"],
+            customdata=np.stack((df['top_entities'], df['counts']), axis=-1),
+
+            hovertemplate='<br>'.join([
+                'Sentiment: %{y}',
+                'Tweet Count: %{customdata[1]}',
+                'Entitites : %{customdata[0]}',
+            ]),
+            line={'color': '#0057B8', "width": 5},
+            showlegend=True, ),
+        secondary_y=True,
+    )
+
+    fig.add_trace(
+
+        go.Scatter(
+            x=df["timestamps"],
+            y=df["positve"],
             customdata=np.stack((df['top_entities'], df['counts']), axis=-1),
             hovertemplate='<br>'.join([
                 'Sentiment: %{y}',
                 'Tweet Count: %{customdata[1]}',
                 'Entitites : %{customdata[0]}',
             ]),
-            line={'color': '#0057B8', "width": 5}),
+            line={'color': '#0057B8', "width": 5},
+            showlegend=True, ),
         secondary_y=True,
     )
+    fig.data[-1].name = 'share positive'
+    fig.data[-2].name = 'share negative'
+    fig.data[-3].name = 'Number of Tweets'
 
     # fig['layout']['yaxis']['autorange'] = "reversed"
 
@@ -107,9 +123,10 @@ async def getPlots(item: Item):
     fig.update_xaxes(title_text="Date")
 
     # Set y-axes titles
-    fig.update_yaxes(title_text="Sentiment", secondary_y=False)
-    fig.update_yaxes(title_text="Tweet Count", secondary_y=True)
+    fig.update_yaxes(title_text="Tweet Count", secondary_y=False)
+    fig.update_yaxes(title_text="Sentiment", secondary_y=True)
 
     plot_json = pio.to_json(fig)
     parsed = json.loads(plot_json)
+    response["plot"] = parsed
     return JSONResponse(response)
