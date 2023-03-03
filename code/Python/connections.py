@@ -56,3 +56,4 @@ class elasticSearchConnection:
         chunks = [docs[i:i + chunk_size] for i in range(0, len(docs), chunk_size)]
         for chunk in chunks:
             helpers.bulk(self.client, chunk, index=index)
+        self.client.indices.refresh(index=index)
