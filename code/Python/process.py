@@ -45,10 +45,9 @@ def process(config):
     sent = sentimentModel(config["process"]["sentimentModel"])
 
     with es(**config["elastic"]) as conn:
-        #conn.client.indices.delete(config["process"]["indexName"])
         print(conn.client.info())
         if not conn.client.indices.exists(config["process"]["indexName"]):
-            createIndex(conn, config["process"]["indexName"])
+            conn.createIndex(config["process"]["indexName"])
 
         for index, row in tqdm(df.iterrows()):
             doc = {"text": row["trans"],
