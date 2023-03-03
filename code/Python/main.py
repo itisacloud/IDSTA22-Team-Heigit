@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("command",
                     action="store",
                     default=None,
-                    choices=["preprocess","process","full","bulk"],)
+                    choices=["preprocess","process","full","full+bulk","api","bulk"],)
 
 parser.add_argument("-c","--config",
                     action="store",
@@ -29,13 +29,30 @@ if args.command == "preprocess":
     preprocess(config)
 if args.command == "process":
     process(config)
+
 if args.command == "api":
     import uvicorn
     uvicorn.run("main:app")
+
+
 if args.command == "bulk":
     from connections import elasticSearchConnection as es
     with es(**config["elastic"]) as conn:
         conn.bulkImport(config["process"]["indexName"],config["bulk"]["filepath"])
+
+if args.command == "full":
+    preprocess(config)
+    process(config)
+    import uvicorn
+    uvicorn.run("main:app")
+
+if args.command == "full+bulk":
+    from connections import elasticSearchConnection as es
+    with es(**config["elastic"]) as conn:
+        conn.bulkImport(config["process"]["indexName"], config["bulk"]["filepath"])
+    import uvicorn
+    uvicorn.run("main:app")
+
 
 from fastapi import FastAPI
 from pydantic import BaseModel
