@@ -5,7 +5,7 @@ from connections import elasticSearchConnection as es
 import utils_api
 import json
 from fastapi.responses import JSONResponse
-from main import readConfig
+from utils import readConfig
 
 config = readConfig("../default.config")
 
